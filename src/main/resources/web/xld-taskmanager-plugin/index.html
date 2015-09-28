@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- CSS styles -->
+    <link rel="stylesheet" href="css/print.css" type="text/css" media="print"/>
+    <link rel="stylesheet" href="libs/css/bootstrap/dist/css/bootstrap.css" media="screen,print"/>
+    <link rel="stylesheet" href="css/taskmanager-plugin.css" media="screen"/>
+
+    <!-- External libraries -->
+    <script src="libs/js/lodash/lodash.compat.js"></script>
+    <script src="libs/js/angular/angular.js"></script>
+    <script src="libs/js/angular-resource/angular-resource.js"></script>
+    <script src="libs/js/respond/respond.src.js"></script>
+    <script src="libs/js/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="libs/js/jquery/dist/jquery.js"></script>
+
+    <!-- Applications -->
+    <script src="js/taskApp.js"></script>
+
+    <!-- Services -->
+    <script src="js/services/jsonHttpService.js"></script>
+    <script src="js/services/tasksService.js"></script>
+
+    <!-- Controllers -->
+    <script src="js/controllers/tmController.js"></script>
+
+</head>
+<!--[if lte IE 9]>
+<body>
+<div class="view-container">
+    <div class="browser-upgrade">You are using an <strong>outdated</strong> browser. The Compare feature requires Internet Explorer 10 or later. <br/>
+        Please refer to the <a href="https://docs.xebialabs.com/xl-deploy/concept/requirements-for-installing-xl-deploy.html#client-requirements"
+                               target="_blank">client requirements</a> for more information.</div>
+</div>
+</body>
+<![endif]-->
+<!--[if !lte IE 9]><!-->
+<body ng-app="TaskApp">
+
+<div class="view-container">
+
+    <div class="sub-header">
+        <div class="sub-header-top">
+            <img class="xl-deploy-logo" src="img/xl-deploy-logo.png" alt title border="0"/>
+            <span class="page-title">Task Manager</span>
+        </div>
+    </div>
+
+    <div class="view" ng-controller="TaskManagerController">
+        <div class="view-data" ng-init="loadTaskList()">
+            <accordion close-others="oneAtATime">
+                <accordion-group ng-repeat="task in taskList">
+                    <accordion-heading>
+                        <div ng-click="loadTaskDetails(task)">
+                            {{task.metadata['taskType']}} deployment of {{task.metadata['application']}}/{{task.metadata['version']}} to {{task.metadata['environment']}}
+                            <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': task.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING'].indexOf(task.state), 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(task.state) > -1}"></i>
+                        </div>
+                    </accordion-heading>
+                    <ul>
+                        <li>id: {{task.id}}</li>
+                        <li>owner: {{task.owner}}</li>
+                        <li>Details: {{detailedTask.state}}</li>
+                    </ul>
+                </accordion-group>
+            </accordion>
+            <span ng-if="isEmptyTaskList()" id="task-list-empty">No active tasks.</span>
+            <button id="getAllTasks" type="submit" class="xl-button pull-right" value="Refresh"
+                    title="Refresh" ng-if="showRefreshButton()" ng-click="loadTaskList()">
+                <span>Refresh</span>
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+<![endif]-->
+</html>

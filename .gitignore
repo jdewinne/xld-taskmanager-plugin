@@ -1,0 +1,8 @@
+*/src/main/web/*/libs
+.gradle
+.idea
+bower_components/
+build
+node_modules/
+xld-taskmanager-plugin.iml
+
