@@ -65,6 +65,7 @@ task bowerSyncStylesheets(type: Sync) {
     into "src/main/resources/web/xld-taskmanager-plugin/libs/css"
     include 'bootstrap/dist/**/*.css'
     include 'bootstrap/dist/**/glyphicons*.*'
+    include 'angular-ui-tree/dist/**/*.css'
     dependsOn bower
 }
 

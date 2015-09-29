@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="css/print.css" type="text/css" media="print"/>
     <link rel="stylesheet" href="libs/css/bootstrap/dist/css/bootstrap.css" media="screen,print"/>
     <link rel="stylesheet" href="css/taskmanager-plugin.css" media="screen"/>
+    <link rel="stylesheet" href="libs/css/angular-ui-tree/dist/angular-ui-tree.min.css">
 
     <!-- External libraries -->
     <script src="libs/js/lodash/lodash.compat.js"></script>
@@ -13,6 +14,7 @@
     <script src="libs/js/respond/respond.src.js"></script>
     <script src="libs/js/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="libs/js/jquery/dist/jquery.js"></script>
+    <script src="libs/js/angular-ui-tree/dist/angular-ui-tree.js"></script>
 
     <!-- Applications -->
     <script src="js/taskApp.js"></script>
@@ -28,7 +30,7 @@
 <!--[if lte IE 9]>
 <body>
 <div class="view-container">
-    <div class="browser-upgrade">You are using an <strong>outdated</strong> browser. The Compare feature requires Internet Explorer 10 or later. <br/>
+    <div class="browser-upgrade">You are using an <strong>outdated</strong> browser. The Task Manager feature requires Internet Explorer 10 or later. <br/>
         Please refer to the <a href="https://docs.xebialabs.com/xl-deploy/concept/requirements-for-installing-xl-deploy.html#client-requirements"
                                target="_blank">client requirements</a> for more information.</div>
 </div>
@@ -36,6 +38,30 @@
 <![endif]-->
 <!--[if !lte IE 9]><!-->
 <body ng-app="TaskApp">
+
+<!-- Nested node template -->
+<script type="text/ng-template" id="blocks_renderer.html">
+    <div ui-tree-handle class="tree-node tree-node-content">
+        <i class="pull-left glyphicon" ng-class="{'glyphicon-random': block.blocks && block.blocks.length > 0 && block.parallel, 'glyphicon-list-alt': (block.blocks && block.blocks.length > 0 && !block.parallel) || (block.steps && block.steps.length > 0)}"></i>
+        &nbsp;{{block.description}}
+        <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': block.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(block.state), 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(block.state) > -1}"></i>
+    </div>
+    <ol ui-tree-nodes="" ng-model="block.blocks" ng-class="{hidden: collapsed}">
+        <li ng-repeat="block in block.blocks" ui-tree-node ng-include="'blocks_renderer.html'"></li>
+        <ol ui-tree-nodes="" ng-model="block.steps" ng-class="{hidden: collapsed}">
+            <li ng-repeat="step in block.steps" ui-tree-node ng-include="'steps_renderer.html'"></li>
+        </ol>
+    </ol>
+</script>
+
+<!-- Nested node template -->
+<script type="text/ng-template" id="steps_renderer.html">
+    <div ui-tree-handle class="tree-node tree-node-content">
+        {{step.description}}
+        <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': step.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(step.state) > -1, 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(step.state) > -1, 'glyphicon-ban-circle': step.state == 'SKIP'}"></i>
+    </div>
+</script>
+
 
 <div class="view-container">
 
@@ -48,12 +74,12 @@
 
     <div class="view" ng-controller="TaskManagerController">
         <div class="view-data" ng-init="loadTaskList()">
-            <accordion close-others="oneAtATime">
+            <accordion close-others="true">
                 <accordion-group ng-repeat="task in taskList">
                     <accordion-heading>
                         <div ng-click="loadTaskDetails(task)">
                             {{task.metadata['taskType']}} deployment of {{task.metadata['application']}}/{{task.metadata['version']}} to {{task.metadata['environment']}}
-                            <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': task.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING'].indexOf(task.state), 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(task.state) > -1}"></i>
+                            <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': task.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(task.state) > -1, 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(task.state) > -1}"></i>
                         </div>
                     </accordion-heading>
                     <ul>
@@ -61,6 +87,14 @@
                         <li>owner: {{task.owner}}</li>
                         <li>Details: {{detailedTask.state}}</li>
                     </ul>
+                    <div ui-tree data-drag-enabled="false">
+                        <ol ui-tree-nodes="" ng-model="detailedTask.blocks" id="tree-blocks-root">
+                            <li ng-repeat="block in detailedTask.blocks" ui-tree-node ng-include="'blocks_renderer.html'"></li>
+                            <ol ui-tree-nodes="" ng-model="detailedTask.steps" id="tree-steps-root">
+                                <li ng-repeat="step in detailedTask.steps" ui-tree-node ng-include="'steps_renderer.html'"></li>
+                            </ol>
+                        </ol>
+                    </div>
                 </accordion-group>
             </accordion>
             <span ng-if="isEmptyTaskList()" id="task-list-empty">No active tasks.</span>

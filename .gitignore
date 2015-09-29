@@ -1,4 +1,4 @@
-*/src/main/web/*/libs
+src/main/resources/web/*/libs/
 .gradle
 .idea
 bower_components/
