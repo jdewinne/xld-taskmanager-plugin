@@ -39,10 +39,11 @@
 <!--[if !lte IE 9]><!-->
 <body ng-app="TaskApp">
 
-<!-- Nested node template -->
+<!-- Nested node template blocks renderer-->
 <script type="text/ng-template" id="blocks_renderer.html">
     <div ui-tree-handle class="tree-node tree-node-content">
-        <i class="pull-left glyphicon" ng-class="{'glyphicon-random': block.blocks && block.blocks.length > 0 && block.parallel, 'glyphicon-list-alt': (block.blocks && block.blocks.length > 0 && !block.parallel) || (block.steps && block.steps.length > 0)}"></i>
+        <i class="pull-left glyphicon" ng-class="{'glyphicon-random': block.blocks && block.blocks.length > 0 && block.parallel, 'glyphicon-list-alt': (block.blocks && block.blocks.length > 0 && !block.parallel) || (block.steps && block.steps.length > 0)}"
+           data-nodrag ng-click="toggle(this)"></i>
         &nbsp;{{block.description}}
         <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': block.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(block.state), 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(block.state) > -1}"></i>
     </div>
@@ -54,11 +55,14 @@
     </ol>
 </script>
 
-<!-- Nested node template -->
+<!-- Nested node template steps renderer-->
 <script type="text/ng-template" id="steps_renderer.html">
     <div ui-tree-handle class="tree-node tree-node-content">
         {{step.description}}
-        <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': step.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(step.state) > -1, 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(step.state) > -1, 'glyphicon-ban-circle': step.state == 'SKIP'}"></i>
+        <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': step.state == 'FAILED',
+                                                'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(step.state) > -1,
+                                                'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(step.state) > -1,
+                                                'glyphicon-ban-circle': ['SKIP', 'SKIPPED'].indexOf(step.state) > -1}"></i>
     </div>
 </script>
 
@@ -89,7 +93,7 @@
                     </ul>
                     <div ui-tree data-drag-enabled="false">
                         <ol ui-tree-nodes="" ng-model="detailedTask.blocks" id="tree-blocks-root">
-                            <li ng-repeat="block in detailedTask.blocks" ui-tree-node ng-include="'blocks_renderer.html'"></li>
+                            <li ng-repeat="block in detailedTask.blocks" ui-tree-node data-collapsed="true" ng-include="'blocks_renderer.html'"></li>
                             <ol ui-tree-nodes="" ng-model="detailedTask.steps" id="tree-steps-root">
                                 <li ng-repeat="step in detailedTask.steps" ui-tree-node ng-include="'steps_renderer.html'"></li>
                             </ol>
