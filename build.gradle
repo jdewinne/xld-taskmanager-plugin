@@ -49,14 +49,9 @@ task bower(dependsOn: 'npm', type: Exec){
     commandLine "${npmBin.binPath}bower", 'install'
 }
 
-task bowerSyncJavascript(type: Sync) {
+task bowerSync(type: Sync) {
     from 'bower_components'
-    into "src/main/resources/web/xld-taskmanager-plugin/libs/js"
-    exclude '**/*.min.js'
-    exclude '**/angular*/index.js'
-    exclude '**/angular*/ng*.js'
-    include 'jquery/dist/jquery.js'
-    include 'angular*/**/*.js'
+    into "src/main/resources/web/xld-taskmanager-plugin/libs"
     dependsOn bower
 }
 
@@ -66,11 +61,12 @@ task bowerSyncStylesheets(type: Sync) {
     include 'bootstrap/dist/**/*.css'
     include 'bootstrap/dist/**/glyphicons*.*'
     include 'angular-ui-tree/dist/**/*.css'
+    include 'xl-ui-components/dist/**/*.css'
     dependsOn bower
 }
 
 task bowerPackages() {
-    dependsOn bowerSyncJavascript, bowerSyncStylesheets
+    dependsOn bowerSync
 }
 
 clean{

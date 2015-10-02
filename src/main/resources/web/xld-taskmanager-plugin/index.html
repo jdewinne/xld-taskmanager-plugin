@@ -3,18 +3,31 @@
 <head>
     <!-- CSS styles -->
     <link rel="stylesheet" href="css/print.css" type="text/css" media="print"/>
-    <link rel="stylesheet" href="libs/css/bootstrap/dist/css/bootstrap.css" media="screen,print"/>
+    <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.css" media="screen,print"/>
     <link rel="stylesheet" href="css/taskmanager-plugin.css" media="screen"/>
-    <link rel="stylesheet" href="libs/css/angular-ui-tree/dist/angular-ui-tree.min.css">
+    <link rel="stylesheet" href="libs/xl-ui-components/dist/styles/xl-components.css" media="screen,print"/>
 
     <!-- External libraries -->
-    <script src="libs/js/lodash/lodash.compat.js"></script>
-    <script src="libs/js/angular/angular.js"></script>
-    <script src="libs/js/angular-resource/angular-resource.js"></script>
-    <script src="libs/js/respond/respond.src.js"></script>
-    <script src="libs/js/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="libs/js/jquery/dist/jquery.js"></script>
-    <script src="libs/js/angular-ui-tree/dist/angular-ui-tree.js"></script>
+
+    <script src="libs/highlightjs/highlight.pack.js"></script>
+    <script src="libs/lodash/dist/lodash.compat.js"></script>
+    <script src="libs/jquery/dist/jquery.js"></script>
+    <script src="libs/jquery-ui/jquery-ui.js"></script>
+    <script src="libs/blueimp-file-upload/js/jquery.fileupload.js"></script>
+    <script src="libs/select2/select2.js"></script>
+    <script src="libs/angular/angular.js"></script>
+    <script src="libs/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="libs/angular-dragdrop/src/angular-dragdrop.js"></script>
+    <script src="libs/angular-resource/angular-resource.min.js"></script>
+    <script src="libs/angular-route/angular-route.min.js"></script>
+    <script src="libs/angular-ui-select2/src/select2.js"></script>
+    <script src="libs/angular-ui-sortable/sortable.min.js"></script>
+    <script src="libs/angular-highlightjs/angular-highlightjs.min.js"></script>
+
+
+
+    <script type="text/javascript" src="libs/xl-ui-components/dist/xl-components.js"></script>
+    <script type="text/javascript" src="libs/xl-ui-components/dist/xl-components-templates.js"></script>
 
     <!-- Applications -->
     <script src="js/taskApp.js"></script>
@@ -38,33 +51,6 @@
 <![endif]-->
 <!--[if !lte IE 9]><!-->
 <body ng-app="TaskApp">
-
-<!-- Nested node template blocks renderer-->
-<script type="text/ng-template" id="blocks_renderer.html">
-    <div ui-tree-handle class="tree-node tree-node-content">
-        <i class="pull-left glyphicon" ng-class="{'glyphicon-random': block.blocks && block.blocks.length > 0 && block.parallel, 'glyphicon-list-alt': (block.blocks && block.blocks.length > 0 && !block.parallel) || (block.steps && block.steps.length > 0)}"
-           data-nodrag ng-click="toggle(this)"></i>
-        &nbsp;{{block.description}}
-        <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': block.state == 'FAILED', 'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(block.state), 'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(block.state) > -1}"></i>
-    </div>
-    <ol ui-tree-nodes="" ng-model="block.blocks" ng-class="{hidden: collapsed}">
-        <li ng-repeat="block in block.blocks" ui-tree-node ng-include="'blocks_renderer.html'"></li>
-        <ol ui-tree-nodes="" ng-model="block.steps" ng-class="{hidden: collapsed}">
-            <li ng-repeat="step in block.steps" ui-tree-node ng-include="'steps_renderer.html'"></li>
-        </ol>
-    </ol>
-</script>
-
-<!-- Nested node template steps renderer-->
-<script type="text/ng-template" id="steps_renderer.html">
-    <div ui-tree-handle class="tree-node tree-node-content">
-        {{step.description}}
-        <i class="pull-right glyphicon" ng-class="{'glyphicon-flash': step.state == 'FAILED',
-                                                'glyphicon-repeat': ['EXECUTING','FAILING','PENDING'].indexOf(step.state) > -1,
-                                                'glyphicon-check': ['EXECUTED', 'DONE'].indexOf(step.state) > -1,
-                                                'glyphicon-ban-circle': ['SKIP', 'SKIPPED'].indexOf(step.state) > -1}"></i>
-    </div>
-</script>
 
 
 <div class="view-container">
@@ -91,13 +77,12 @@
                         <li>owner: {{task.owner}}</li>
                         <li>Details: {{detailedTask.state}}</li>
                     </ul>
-                    <div ui-tree data-drag-enabled="false">
-                        <ol ui-tree-nodes="" ng-model="detailedTask.blocks" id="tree-blocks-root">
-                            <li ng-repeat="block in detailedTask.blocks" ui-tree-node data-collapsed="true" ng-include="'blocks_renderer.html'"></li>
-                            <ol ui-tree-nodes="" ng-model="detailedTask.steps" id="tree-steps-root">
-                                <li ng-repeat="step in detailedTask.steps" ui-tree-node ng-include="'steps_renderer.html'"></li>
-                            </ol>
-                        </ol>
+
+                    <div id="taskTree" class="xl-widget-tree-view tree-container"
+                         ng-init="currentNode={};">
+                        <div class="testComponent">
+                            <div xl-widget-tree-view current-node="currentNode" options="treeOptions" datasource="findNodeChildren" nodes="treeModel" ng-if="treeModel.length > 0"></div>
+                        </div>
                     </div>
                 </accordion-group>
             </accordion>

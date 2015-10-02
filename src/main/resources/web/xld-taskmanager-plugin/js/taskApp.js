@@ -1,4 +1,4 @@
-var app = angular.module('TaskApp', ['ngResource', 'ui.bootstrap', 'ui.tree']);
+var app = angular.module('TaskApp', ['ngResource', 'ui.bootstrap', 'xl.components', 'xl.templates']);
 
 app.config(
     function ($httpProvider, $locationProvider) {
